@@ -1,5 +1,4 @@
 #include "widget.h"
-#include <QLabel>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -8,27 +7,33 @@ Widget::Widget(QWidget *parent)
 }
 
 void Widget::setupUi() {
-    this->setWindowTitle("\u1F680大战");
-    this->resize(640, 480);
+    this->setWindowTitle("\u2708大战");
+    this->setFixedSize(1280, 400);
 
-    myplane = new QLabel;
-    myplane->setText("\u1F680");
-    myplane->setParent(this);
-    myplane->setVisible(false);
+    m_draw_intr_device = new QTimer(this);
+    m_clock_intr_device = new QTimer(this);
 
-    yourplane = new QLabel;
-    yourplane->setText("\u1f605");
-    yourplane->setParent(this);
-    yourplane->setVisible(false);
+    connect(m_draw_intr_device, &QTimer::timeout, this, QOverload<>::of(&Widget::update));
+    connect(m_clock_intr_device, &QTimer::timeout, this, &Widget::ClockIntrExec);
+
+    m_clock_intr_device->start();
 }
 
-void Widget::initFunc() {
+void Widget::keyPressEvent(QKeyEvent *e){
 
 }
 
-Widget::~Widget()
-{
-    delete myplane;
-    delete yourplane;
+void paintEvent(QPaintEvent *e) {
+
+    for (int i = 0; i < 25; ++i) {
+        for (int j = 0; j < 80; ++j) {
+            if (a[i][j] == 1) {
+
+            }
+        }
+    }
 }
 
+void Widget::ClockIntrExec() {
+
+}

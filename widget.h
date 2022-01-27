@@ -6,37 +6,27 @@
 #include <QThread>
 #include <QTimer>
 #include <QPainter>
+#include <QKeyEvent>
+#include <QPaintEvent>
+#include <QPoint>
+#include <QRandomGenerator>
 
-class Clock_intr: public QTimer {
+class Widget : public QWidget {
     Q_OBJECT
 
-};
-
-class Draw_intr: public QPainter {
-
-};
-
-class Key_intr: public QWidget {
-
-
-};
-
-class Widget : public QWidget
-{
-    Q_OBJECT
-
-    int pos [25][80];
     QLabel *myplane, *yourplane;
     QThread myp_thread, yourp_thread;
-    Clock_intr m_clock_intr;
-    Draw_intr m_draw_intr;
-    Key_intr m_key_intr;
+    QTimer *m_clock_intr_device, *m_draw_intr_device;
+    QRandomGenerator random;
+    int mem[25][80];
+    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void paintEvent(QPaintEvent *e);
+
+    void setupUi();
 public:
     Widget(QWidget *parent = nullptr);
+    void ClockIntrExec();
+    void KeyIntrExec();
     ~Widget();
-    void setupUi();
-    void initFunc();
-    void keyIntr();
-    void clockIntr();
 };
 #endif // WIDGET_H
