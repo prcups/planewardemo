@@ -8,8 +8,8 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QPaintEvent>
-#include <QPoint>
 #include <QRandomGenerator>
+#include <QReadWriteLock>
 
 class Widget : public QWidget {
     Q_OBJECT
@@ -19,10 +19,10 @@ class Widget : public QWidget {
     QTimer *m_clock_intr_device, *m_draw_intr_device;
     QRandomGenerator random;
     int mem[25][80];
+    QReadWriteLock memLock;
+    QPainter painter;
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void paintEvent(QPaintEvent *e);
-
-    void setupUi();
 public:
     Widget(QWidget *parent = nullptr);
     void ClockIntrExec();
