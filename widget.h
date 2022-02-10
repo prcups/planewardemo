@@ -51,6 +51,7 @@ protected:
     QList<node> bullets;
     nodeType myType;
     node position;
+    int ifEmit = 0;
 public:
     Plane(int x, int y, nodeType t): m_status(NotStart), mem(new QSharedMemory("mem")), position({x, y}), myType(t) {
         mem->attach();
@@ -75,11 +76,10 @@ public slots:
 
 class MyPlane: public Plane {
     using Plane::Plane;
-    int ifEmit = 0;
 public:
     virtual void run() {
         if ((++ifEmit) % 2) {
-            bullets.insert(bullets.begin(), {position.x, position.y});
+            bullets.insert(bullets.end(), {position.x, position.y});
         }
         for (QList<node>::iterator i = bullets.begin(); i != bullets.end();) {
             if (i->x) {
@@ -105,7 +105,9 @@ class EvilPlane: public Plane {
     using Plane::Plane;
 public:
     virtual void run() {
-        bullets.insert(bullets.begin(), {position.x, position.y});
+        if ((++ifEmit) % 2) {
+            bullets.insert(bullets.end(), {position.x, position.y});
+        }
         for (QList<node>::iterator i = bullets.begin(); i != bullets.end();) {
             if (i->x != 24) {
                 ++i->x;
