@@ -36,6 +36,7 @@ enum statusType {
     Victory,
     Failure
 };
+Q_DECLARE_METATYPE(statusType);
 
 struct node {
     int x, y;
@@ -99,6 +100,38 @@ public:
             }
         }
     }
+    void handleKey(int key) {
+        switch (key) {
+        case Qt::Key_Up:
+            --position.x;
+            mem->lock();
+            memdata[position.x + 1][position.y] = Empty;
+            memdata[position.x][position.y] = MyPlaneT;
+            mem->unlock();
+            break;
+        case Qt::Key_Down:
+            ++position.x;
+            mem->lock();
+            memdata[position.x - 1][position.y] = Empty;
+            memdata[position.x][position.y] = MyPlaneT;
+            mem->unlock();
+            break;
+        case Qt::Key_Left:
+            --position.y;
+            mem->lock();
+            memdata[position.x][position.y + 1] = Empty;
+            memdata[position.x][position.y] = MyPlaneT;
+            mem->unlock();
+            break;
+        case Qt::Key_Right:
+            ++position.y;
+            mem->lock();
+            memdata[position.x][position.y - 1] = Empty;
+            memdata[position.x][position.y] = MyPlaneT;
+            mem->unlock();
+            break;
+        }
+    }
 };
 
 class EvilPlane: public Plane {
@@ -149,6 +182,7 @@ class Widget : public QWidget {
     void handleStatus(statusType status);
 
     virtual void paintEvent(QPaintEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e);
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();

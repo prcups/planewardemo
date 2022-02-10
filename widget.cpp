@@ -6,7 +6,7 @@ Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
     this->setWindowTitle("飞机大战");
-    this->setFixedSize(ELEMENT_HEIGHT_NUM * ELEMENT_EDGE_LENGTH, ELEMENT_WIDTH_NUM * ELEMENT_EDGE_LENGTH);
+    this->setFixedSize(ELEMENT_WIDTH_NUM * ELEMENT_EDGE_LENGTH, ELEMENT_HEIGHT_NUM * ELEMENT_EDGE_LENGTH);
     mem = new QSharedMemory("mem");
     mem->create(ELEMENT_HEIGHT_NUM * ELEMENT_WIDTH_NUM * sizeof(nodeType));
     memdata = static_cast<nodeType (*)[ELEMENT_WIDTH_NUM]>(mem->data());
@@ -77,4 +77,9 @@ void Widget::handleStatus(statusType status) {
     if (status != Running) {
         m_clock_intr_device->stop();
     }
+}
+
+void Widget::keyPressEvent(QKeyEvent *e)
+{
+    myp->handleKey(e->key());
 }
