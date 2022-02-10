@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>MyPlane.ico</file>
+        <file>EvilPlane.ico</file>
+    </qresource>
+</RCC>
