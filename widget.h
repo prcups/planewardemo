@@ -27,7 +27,8 @@ enum nodeType {
     MyPlaneT,
     EvilPlaneT,
     MyBulletT,
-    EvilBulletT
+    EvilBulletT,
+    MultiBulletT
 };
 
 enum statusType {
@@ -44,7 +45,6 @@ struct node {
 
 class Plane: public QThread {
     Q_OBJECT
-
     statusType m_status;
 protected:
     QSharedMemory *mem;
@@ -54,13 +54,7 @@ protected:
     node position;
     int ifEmit = 0;
 public:
-    Plane(int x, int y, nodeType t): m_status(NotStart), mem(new QSharedMemory("mem")), position({x, y}), myType(t) {
-        mem->attach();
-        memdata = (nodeType (*)[ELEMENT_WIDTH_NUM]) mem->data();
-        mem->lock();
-        memdata[position.x][position.y] = myType;
-        mem->unlock();
-    }
+    Plane(int x, int y, nodeType t);
     ~Plane() {
         delete mem;
     }
@@ -78,87 +72,14 @@ public slots:
 class MyPlane: public Plane {
     using Plane::Plane;
 public:
-    virtual void run() {
-        if ((++ifEmit) % 2) {
-            bullets.insert(bullets.end(), {position.x, position.y});
-        }
-        for (QList<node>::iterator i = bullets.begin(); i != bullets.end();) {
-            if (i->x) {
-                --i->x;
-                mem->lock();
-                if (memdata[i->x + 1][i->y] == EvilBulletT) memdata[i->x + 1][i->y] = Empty;
-                if (memdata[i->x][i->y] == EvilPlaneT) setStatus(Victory);
-                else if (memdata[i->x][i->y == MyPlaneT]) setStatus(Failure);
-                else memdata[i->x][i->y] = EvilBulletT;
-                mem->unlock();
-                ++i;
-            } else {
-                mem->lock();
-                memdata[i->x][i->y] = Empty;
-                mem->unlock();
-                i = bullets.erase(i);
-            }
-        }
-    }
-    void handleKey(int key) {
-        switch (key) {
-        case Qt::Key_Up:
-            --position.x;
-            mem->lock();
-            memdata[position.x + 1][position.y] = Empty;
-            memdata[position.x][position.y] = MyPlaneT;
-            mem->unlock();
-            break;
-        case Qt::Key_Down:
-            ++position.x;
-            mem->lock();
-            memdata[position.x - 1][position.y] = Empty;
-            memdata[position.x][position.y] = MyPlaneT;
-            mem->unlock();
-            break;
-        case Qt::Key_Left:
-            --position.y;
-            mem->lock();
-            memdata[position.x][position.y + 1] = Empty;
-            memdata[position.x][position.y] = MyPlaneT;
-            mem->unlock();
-            break;
-        case Qt::Key_Right:
-            ++position.y;
-            mem->lock();
-            memdata[position.x][position.y - 1] = Empty;
-            memdata[position.x][position.y] = MyPlaneT;
-            mem->unlock();
-            break;
-        }
-    }
+    virtual void run();
+    void handleKey(int key);
 };
 
 class EvilPlane: public Plane {
     using Plane::Plane;
 public:
-    virtual void run() {
-        if ((++ifEmit) % 2) {
-            bullets.insert(bullets.end(), {position.x, position.y});
-        }
-        for (QList<node>::iterator i = bullets.begin(); i != bullets.end();) {
-            if (i->x != 24) {
-                ++i->x;
-                mem->lock();
-                if (memdata[i->x - 1][i->y] == EvilBulletT) memdata[i->x - 1][i->y] = Empty;
-                if (memdata[i->x][i->y] == EvilPlaneT) setStatus(Victory);
-                else if (memdata[i->x][i->y == MyPlaneT]) setStatus(Failure);
-                else memdata[i->x][i->y] = EvilBulletT;
-                mem->unlock();
-                ++i;
-            } else {
-                mem->lock();
-                memdata[i->x][i->y] = Empty;
-                mem->unlock();
-                i = bullets.erase(i);
-            }
-        }
-    }
+    virtual void run();
 };
 
 class Widget : public QWidget {
@@ -171,7 +92,6 @@ class Widget : public QWidget {
     QImage *myPlaneImage, *evilPlaneImage;
 
     QPainter painter;
-    QRandomGenerator random;
 
     MyPlane *myp;
     EvilPlane *evilp;
